@@ -1,0 +1,113 @@
+---
+title: "Analysis Report"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    fig_caption: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(lme4)
+library(ggplot2)
+library(performance)
+library(DHARMa)
+library(see)
+```
+
+# 1. Overview
+
+This report documents the statistical analyses, model comparisons, and diagnostic checks for the thesis data.
+
+# 2. Data Preparation
+
+```{r}
+head(final_data)
+```
+
+# 3. Hypothesis 1 – Hedonic Condition: √n and Judgment Strength
+
+## 3.1 Model Summaries
+
+```{r}
+summary(model_linear_h1)
+summary(model_mixed_h1)
+summary(model_mixed_rs_h1)
+anova(model_mixed_h1, model_mixed_rs_h1)
+summary(model_covariate)
+```
+
+## 3.2 Correlation & Plot
+
+```{r}
+cor.test(data_hedonic$rating, sqrt(data_hedonic$n))
+plot_h1
+```
+
+# 4. Hypothesis 2 – Interaction: √n × Condition
+
+```{r}
+summary(model_linear_h2)
+summary(model_mixed_h2)
+summary(model_mixed_rs_h2)
+anova(model_mixed_h2, model_mixed_rs_h2)
+summary(model_covariate_h2)
+```
+
+```{r}
+ggplot(final_data, aes(x = sqrt(n), y = rating, color = cond)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Interaction: Condition × √n", x = "√ Sample Size", y = "Judgment Strength") +
+  theme_minimal()
+```
+
+# 5. Hypothesis 3 – Judgment Confidence
+
+```{r}
+summary(model_linear_h3)
+summary(model_mixed_h3)
+summary(model_mixed_rs_h3)
+summary(model_covariate_h3)
+```
+
+```{r}
+ggplot(final_data, aes(x = sqrt(n), y = confidence, color = cond)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Confidence: √n × Condition", x = "√ Sample Size", y = "Confidence") +
+  theme_minimal()
+```
+
+# 6. Hypothesis 4 – Diagnosticity and Sampling
+
+```{r}
+summary(model_mixed_diag)
+summary(model_cond)
+```
+
+```{r}
+ggplot(final_data, aes(x = candidatePositivity, y = sqrt(n), color = cond)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(title = "Diagnosticity × Condition", x = "Candidate Positivity", y = "√ Sample Size") +
+  theme_minimal()
+```
+
+# 7. Model Fit Summary Tables
+
+```{r}
+fit_stats_h1
+fit_stats_h2
+fit_stats_h3
+fit_stats_h4
+```
+
+# 8. Session Info
+
+```{r}
+sessionInfo()
+```
